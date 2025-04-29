@@ -1,0 +1,2 @@
+route_id,service_id,trip_id,direction_id
+new_bus_route1,weekday,new_bus_trip1,0

@@ -1,0 +1,9 @@
+a,b,time,trip_id,link_sequence,headway
+stop_0,stop_1,60,new_bus_trip1,0,600
+stop_1,stop_2,60,new_bus_trip1,1,600
+stop_2,stop_3,60,new_bus_trip1,2,600
+stop_3,stop_4,60,new_bus_trip1,3,600
+stop_4,stop_5,60,new_bus_trip1,4,600
+stop_5,stop_6,60,new_bus_trip1,5,600
+stop_6,stop_7,60,new_bus_trip1,6,600
+stop_7,stop_8,60,new_bus_trip1,7,600
