@@ -40,20 +40,23 @@ app.layout = dbc.Container([
                     ])
                 ])
             )
-        ], width=3, style={"background-color": "#f8f9fa", "padding": "20px"}),
+        ], xs=12, md=4, lg=3, style={"background-color": "#f8f9fa", "padding": "20px"}),
 
         dbc.Col([
             dl.Map(
                 id="map",
                 center=[45.5017, -73.5673],
                 zoom=12,
-                style={'width': '100%', 'height': '90vh', 'cursor': 'crosshair'},
+                style={'width': '100%', 'height': '70vh', 'minHeight': '400px', 'cursor': 'crosshair'},
                 children=[
                     dl.TileLayer(),
                     dl.FeatureGroup([
                         dl.EditControl(
                             id="edit-control",
-                            draw={'polyline': True, 'marker': True, 'polygon': False, 'rectangle': False, 'circlemarker': False, 'circle': False},
+                            draw={
+                                'polyline': True, 'marker': True, 'polygon': False,
+                                'rectangle': False, 'circlemarker': False, 'circle': False
+                            },
                             edit={'edit': False, 'remove': True},
                             position="topleft",
                         )
@@ -62,12 +65,11 @@ app.layout = dbc.Container([
                 ]
             ),
             html.Div(id="map-info", className="mt-3")
-        ], width=9)
+        ], xs=12, md=8, lg=9)
     ])
 ], fluid=True)
 
-# --- Callbacks
-
+# Callbacks
 @app.callback(
     [Output("map-info", "children"),
      Output("layer-polylines", "children"),
@@ -89,7 +91,6 @@ def generate_gtfs(geojson, n_clicks, current_geojson):
         stops = []
         links = []
         stop_times = []
-
         for i, (lon, lat) in enumerate(coords):
             stops.append({
                 "stop_id": f"stop_{i}",
@@ -97,11 +98,10 @@ def generate_gtfs(geojson, n_clicks, current_geojson):
                 "stop_lat": lat,
                 "stop_lon": lon
             })
-
             stop_times.append({
                 "trip_id": "new_bus_trip1",
-                "arrival_time": f"07:{str(i).zfill(2)}:00",
-                "departure_time": f"07:{str(i).zfill(2)}:00",
+                "arrival_time": f"07:{i:02d}:00",
+                "departure_time": f"07:{i:02d}:00",
                 "stop_id": f"stop_{i}",
                 "stop_sequence": i
             })
@@ -116,23 +116,10 @@ def generate_gtfs(geojson, n_clicks, current_geojson):
                 "headway": 600
             })
 
-        trips = [{
-            "route_id": "new_bus_route1",
-            "service_id": "weekday",
-            "trip_id": "new_bus_trip1",
-            "direction_id": 0  # ✅ FIXED
-        }]
-
-        routes = [{
-            "route_id": "new_bus_route1",
-            "agency_id": "agency1",
-            "route_short_name": "NB1",
-            "route_long_name": "New Bus Route 1",
-            "route_type": 3  # 3 = Bus
-        }]
+        trips = [{"trip_id": "new_bus_trip1", "route_id": "new_bus_route", "service_id": "WEEK"}]
+        routes = [{"route_id": "new_bus_route", "route_short_name": "NB", "route_long_name": "New Bus Line", "route_type": 3}]
 
         os.makedirs("output", exist_ok=True)
-
         pd.DataFrame(stops).to_csv("output/stops.txt", index=False)
         pd.DataFrame(links).to_csv("output/links.txt", index=False)
         pd.DataFrame(stop_times).to_csv("output/stop_times.txt", index=False)
@@ -156,6 +143,7 @@ def generate_gtfs(geojson, n_clicks, current_geojson):
 
     return no_update, no_update, no_update, no_update
 
+
 @app.callback(
     [Output("model-status", "children"),
      Output("model-status", "style"),
@@ -176,7 +164,7 @@ def run_model(n_clicks):
         return ("❌ Model error", {"color": "red"}, "❌ Accessibility error", {"color": "red"})
 
 if __name__ == "__main__":
-    # app.run(debug=True)
+    # app.run_server(debug=True)
     import os
     port = int(os.environ.get("PORT", 8050))
     app.run(host="0.0.0.0", port=port, debug=True)
